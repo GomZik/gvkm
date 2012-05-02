@@ -4,6 +4,8 @@ from PyQt4.QtWebKit import *
 
 class Login(QWebView):
     
+    login_link = "http://oauth.vk.com/authorize?client_id=%s&scope=%s&redirect_uri=%s&display=popup&response_type=token"
+    redirect_link = "http://oauth.vk.com/blank.html"
     app_id = "2930771"
     scope = "audio"
     logged_in = pyqtSignal(QString)
@@ -17,7 +19,7 @@ class Login(QWebView):
     def login(self):
         self.load(
             QUrl(
-                "http://oauth.vk.com/authorize?client_id=%s&scope=%s&redirect_uri=http://oauth.vk.com/blank.html&display=popup&response_type=token" % (self.app_id, self.scope)
+                self.login_link % (self.app_id, self.scope, self.redirect_link)
             )
         )
     
@@ -25,7 +27,7 @@ class Login(QWebView):
         if ok:
             url_parts = self.url().toString().split('#')
             if len(url_parts) > 1:
-                if url_parts[0] == "http://oauth.vk.com/blank.html":
+                if url_parts[0] == self.redirect_link:
                     self.hide()
                     self.logged_in.emit(url_parts[1])
                     return

@@ -5,8 +5,12 @@ from PyQt4.QtGui import *
 import time
 import urllib2, json
 import sys, os
+from Login import Login
+from Settings import Settings
 
 class DownloaderThread(QThread):
+    
+    api_link = "https://api.vk.com/method/"
     
     change_status = pyqtSignal(QString, int)
     download_complete = pyqtSignal()
@@ -17,7 +21,7 @@ class DownloaderThread(QThread):
         self.path = path
 
     def run(self):
-        response = urllib2.urlopen("https://api.vk.com/method/audio.get?access_token=%s" % self.token, "r")
+        response = urllib2.urlopen("%saudio.get?access_token=%s" % (self.api_link, self.token), "r")
         audios = json.loads(response.read())
         audios = audios['response']
         i = 1
@@ -36,10 +40,10 @@ class App(QObject):
     
     show_settings = pyqtSignal()
     
-    def __init__(self, login, settings, parent = None):
+    def __init__(self, parent = None):
         QObject.__init__(self, parent)
-        self.login = login
-        self.settings = settings
+        self.login = Login()
+        self.settings = Settings()
         #--- Connections
         self.login.logged_in.connect(self.on_logged_in)
         self.show_settings.connect(self.settings.show)
