@@ -4,10 +4,11 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import time
 import urllib2, json
-import sys, os
+import sys
 from Login import Login
 from Settings import Settings
 from SyncThread import SyncThread
+import pickle
 
 class App(QObject):
     
