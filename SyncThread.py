@@ -3,6 +3,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import os
+import urllib2, json
 
 class SyncThread(QThread):
     
