@@ -26,9 +26,10 @@ class SyncThread(QThread):
             self.change_status.emit(u"Скачивание файла %d \ %d" % (i, len(audios)), round(float(i) / float(len(audios)) * 100))
             filename = "%s/%s - %s.mp3" % (self.path, audio['artist'][:25], audio['title'][:25])
             if not os.path.exists(filename):
-                mp3 = open(filename,'wb')
+                mp3 = open(filename + '.tmp','wb')
                 remote_mp3 = urllib2.urlopen(audio['url'])
                 mp3.write(remote_mp3.read())
                 mp3.close()
+                os.rename(filename + '.tmp', filename)
             i += 1
         self.sync_complete.emit()
