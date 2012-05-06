@@ -8,12 +8,12 @@ import sys, os
 from Login import Login
 from Settings import Settings
 
-class DownloaderThread(QThread):
+class SyncThread(QThread):
     
     api_link = "https://api.vk.com/method/"
     
     change_status = pyqtSignal(QString, int)
-    download_complete = pyqtSignal()
+    sync_complete = pyqtSignal()
     
     def __init__(self, token, path, parent = None):
         QThread.__init__(self, parent)
@@ -34,7 +34,7 @@ class DownloaderThread(QThread):
                 mp3.write(remote_mp3.read())
                 mp3.close()
             i += 1
-        self.download_complete.emit()
+        self.sync_complete.emit()
 
 class App(QObject):
     
@@ -42,6 +42,8 @@ class App(QObject):
     
     def __init__(self, parent = None):
         QObject.__init__(self, parent)
+        self.tray = QSystemTrayIcon(QIcon('images/default_icon.png'))
+        self.tray.show()
         self.login = Login()
         self.settings = Settings()
         #--- Connections
@@ -63,17 +65,17 @@ class App(QObject):
         self.prg.setValue(50)
         path = self.settings.ui.path_to_folder.text()
         
-        self.downloader = DownloaderThread(self.token, path)
-        self.downloader.change_status.connect(self.on_download_status_changed)
-        self.downloader.download_complete.connect(self.on_download_complete)
-        self.downloader.start()
+        self.sync = SyncThread(self.token, path)
+        self.sync.change_status.connect(self.on_sync_status_changed)
+        self.sync.sync_complete.connect(self.on_sync_complete)
+        self.sync.start()
     
     def run(self):
         self.login.login()
         
-    def on_download_status_changed(self, label, progress):
+    def on_sync_status_changed(self, label, progress):
         self.prg.setLabelText(label)
         self.prg.setValue(progress)
         
-    def on_download_complete(self):
+    def on_sync_complete(self):
         sys.exit()
