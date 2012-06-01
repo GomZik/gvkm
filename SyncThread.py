@@ -24,12 +24,15 @@ class SyncThread(QThread):
         i = 1
         for audio in audios:
             self.change_status.emit(u"Скачивание файла %d \ %d" % (i, len(audios)), round(float(i) / float(len(audios)) * 100))
-            filename = "%s/%s - %s.mp3" % (self.path, audio['artist'][:25], audio['title'][:25])
+            filename = u"%s/%s - %s.mp3" % (self.path, audio['artist'][:25], audio['title'][:25])
+            #filename = filename.encode('utf-8')
+            filename = filename.replace('|','_').replace('"','_').replace('?','_')
+            print filename
             if not os.path.exists(filename):
-                mp3 = open(filename + '.tmp','wb')
+                mp3 = open(filename + u'.tmp','wb')
                 remote_mp3 = urllib2.urlopen(audio['url'])
                 mp3.write(remote_mp3.read())
                 mp3.close()
-                os.rename(filename + '.tmp', filename)
+                os.rename(filename + u'.tmp', filename)
             i += 1
         self.sync_complete.emit()
